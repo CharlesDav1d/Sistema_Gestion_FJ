@@ -57,3 +57,40 @@ class Cliente(EntidadGeneral):
     @property
     def correo(self):
         return self.__correo
+
+@correo.setter
+    def correo(self, valor):
+        # Validación estricta manejando errores de datos inválidos [cite: 191]
+        if "@" not in valor or "." not in valor:
+            raise ClienteInvalidoError(f"El correo '{valor}' no tiene un formato válido.")
+        self.__correo = valor
+        
+    def mostrar_detalle(self):
+        return f"Cliente: {self.__nombre} (ID: {self.__identificacion})"
+
+# 5. CLASES DERIVADAS DE SERVICIO (POLIMORFISMO) [cite: 195, 196]
+class ReservaSala(Servicio):
+    def calcular_costo(self, duracion, impuesto=0.0, descuento=0.0):
+        costo = (self.tarifa_base * duracion)
+        return costo + (costo * impuesto) - descuento
+
+    def mostrar_detalle(self):
+        return f"Sala: {self.nombre} - Tarifa/hora: ${self.tarifa_base}"
+
+class AlquilerEquipo(Servicio):
+    def calcular_costo(self, duracion, impuesto=0.0, descuento=0.0):
+        # Los equipos tienen un recargo de seguro fijo
+        costo = (self.tarifa_base * duracion) + 15000 
+        return costo + (costo * impuesto) - descuento
+
+    def mostrar_detalle(self):
+        return f"Equipo: {self.nombre} - Tarifa/día: ${self.tarifa_base}"
+
+class AsesoriaEspecializada(Servicio):
+    def calcular_costo(self, duracion, impuesto=0.0, descuento=0.0):
+        # Asesorías cobran por sesión completa, independientemente de la duración exacta
+        costo = self.tarifa_base
+        return costo + (costo * impuesto) - descuento
+
+    def mostrar_detalle(self):
+        return f"Asesoría: {self.nombre} - Costo sesión: ${self.tarifa_base}"
