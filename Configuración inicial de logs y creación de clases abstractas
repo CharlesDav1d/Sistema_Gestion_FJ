@@ -141,3 +141,56 @@ class Reserva:
         finally:
             # Se ejecuta siempre, ideal para liberar recursos o confirmar estados
             print(f"Estado final de la operación: {self.estado}")
+
+# =====================================================================
+# 7. SIMULACIÓN DE 10 OPERACIONES (VÁLIDAS E INVÁLIDAS) 
+# =====================================================================
+if __name__ == "__main__":
+    print("INICIANDO SISTEMA DE GESTIÓN SOFTWARE FJ...")
+    
+    # Operación 1: Creación correcta de cliente
+    try:
+        cliente1 = Cliente("10456", "Carlos David", "carlos@correo.com")
+        print("Op 1: Cliente 1 creado con éxito.")
+    except Exception as e: pass
+
+    # Operación 2: Creación de cliente con correo inválido (Forzando Error)
+    try:
+        cliente_invalido = Cliente("9999", "Usuario Falso", "correosin_arroba.com")
+    except ClienteInvalidoError as e:
+        logging.error(f"Op 2 Fallida: {e}")
+        print(f"Op 2 (Controlada): {e}")
+
+    # Operación 3: Creación correcta de servicios (Polimorfismo)
+    servicio_asesoria = AsesoriaEspecializada("SRV01", "Asesoría en Seguridad Informativa", 120000)
+    servicio_equipo = AlquilerEquipo("SRV02", "Proyector Calidad ProRes 8K", 45000)
+    print("Op 3: Servicios creados correctamente.")
+
+    # Operación 4: Reserva exitosa (Asesoría)
+    reserva1 = Reserva(cliente1, servicio_asesoria, 1)
+    reserva1.procesar_reserva()
+
+    # Operación 5: Reserva con error de parámetro faltante/inválido (Cliente Nulo)
+    reserva_nula = Reserva(None, servicio_equipo, 2)
+    reserva_nula.procesar_reserva()
+
+    # Operación 6: Reserva con cálculo inconsistente (Duración negativa)
+    reserva_negativa = Reserva(cliente1, servicio_equipo, -5)
+    reserva_negativa.procesar_reserva()
+
+    # Operación 7: Uso de sobrecarga simulada (Descuentos y sin impuestos)
+    print("\nOp 7: Aplicando descuento especial...")
+    costo_descuento = servicio_equipo.calcular_costo(duracion=2, impuesto=0.0, descuento=10000)
+    print(f"Costo del alquiler con descuento y sin IVA: ${costo_descuento}")
+
+    # Operación 8: Capturando error de tipo de dato (Encadenamiento)
+    reserva_tipo_error = Reserva(cliente1, servicio_asesoria, "dos horas")
+    reserva_tipo_error.procesar_reserva()
+
+    # Operación 9: Creación de otra reserva válida
+    cliente2 = Cliente("112233", "Daniela", "dani@correo.com")
+    reserva2 = Reserva(cliente2, servicio_equipo, 3)
+    reserva2.procesar_reserva()
+
+    # Operación 10: Validación final de la estabilidad del sistema
+    print("\nOp 10: El sistema simuló todas las transacciones y sigue en línea. Revisa el archivo registro_errores.log para auditar las excepciones capturadas.")
