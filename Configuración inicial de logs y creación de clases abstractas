@@ -46,3 +46,14 @@ class Servicio(EntidadGeneral, ABC):
     @abstractmethod
     def calcular_costo(self, duracion, impuesto=0.0, descuento=0.0):
         pass
+
+# 4. CLASE CLIENTE CON ENCAPSULACIÓN Implementación de la clase Cliente con encapsulamiento y validación estricta
+class Cliente(EntidadGeneral):
+    def __init__(self, identificacion, nombre, correo):
+        self.__identificacion = identificacion
+        self.__nombre = nombre
+        self.correo = correo  # Usa el property setter para validar
+
+    @property
+    def correo(self):
+        return self.__correo
