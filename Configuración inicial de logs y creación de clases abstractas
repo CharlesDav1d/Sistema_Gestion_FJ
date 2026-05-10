@@ -1,0 +1,48 @@
+import logging
+from abc import ABC, abstractmethod
+from datetime import datetime
+
+# 1. CONFIGURACIÓN DEL ARCHIVO DE LOGS [cite: 190, 203]
+# Registraremos todos los errores detectados para mantener la aplicación estable.
+logging.basicConfig(
+    filename='registro_errores.log', 
+    level=logging.ERROR,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    encoding='utf-8' # <-- Solo debes agregar esta línea
+)
+
+# 2. EXCEPCIONES PERSONALIZADAS 
+class ErrorSistemaFJ(Exception):
+    """Clase base para excepciones personalizadas del sistema."""
+    pass
+
+class ClienteInvalidoError(ErrorSistemaFJ):
+    """Excepción lanzada cuando los datos del cliente son incorrectos."""
+    pass
+
+class ServicioNoDisponibleError(ErrorSistemaFJ):
+    """Excepción lanzada cuando un servicio no puede ser procesado."""
+    pass
+
+class ReservaInvalidaError(ErrorSistemaFJ):
+    """Excepción lanzada por errores en el cálculo o estado de la reserva."""
+    pass
+
+# 3. CLASES ABSTRACTAS [cite: 193, 195]
+class EntidadGeneral(ABC):
+    """Clase abstracta que representa entidades generales del sistema."""
+    @abstractmethod
+    def mostrar_detalle(self):
+        pass
+
+class Servicio(EntidadGeneral, ABC):
+    """Clase abstracta para los servicios, define el contrato de sus hijos."""
+    def __init__(self, codigo, nombre, tarifa_base):
+        self.codigo = codigo
+        self.nombre = nombre
+        self.tarifa_base = tarifa_base
+
+    # Simulamos sobrecarga de métodos mediante parámetros con valores por defecto 
+    @abstractmethod
+    def calcular_costo(self, duracion, impuesto=0.0, descuento=0.0):
+        pass
