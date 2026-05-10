@@ -94,3 +94,50 @@ class AsesoriaEspecializada(Servicio):
 
     def mostrar_detalle(self):
         return f"Asesoría: {self.nombre} - Costo sesión: ${self.tarifa_base}"
+
+# 6. CLASE RESERVA CON MANEJO AVANZADO DE EXCEPCIONES [cite: 197]
+class Reserva:
+    def __init__(self, cliente, servicio, duracion):
+        self.cliente = cliente
+        self.servicio = servicio
+        self.duracion = duracion
+        self.estado = "Pendiente"
+        self.costo_total = 0
+
+    def procesar_reserva(self):
+        """Uso de bloques try/except/else/finally"""
+        print("\n--- Iniciando procesamiento de reserva ---")
+        try:
+            # 1. Primero validamos que los objetos existan y sean del tipo correcto
+            if not isinstance(self.cliente, Cliente):
+                raise ReservaInvalidaError("El cliente asignado no es válido o es nulo.")
+            if not isinstance(self.servicio, Servicio):
+                raise ServicioNoDisponibleError("El servicio solicitado no es válido.")
+            
+            # 2. Si pasamos las validaciones, ahora sí podemos usar sus métodos sin riesgo
+            print(f"Procesando reserva para: {self.cliente.mostrar_detalle()}")
+            
+            if self.duracion <= 0:
+                # Encadenamiento de excepciones
+                error_base = ValueError("La duración debe ser mayor a cero.")
+                raise ReservaInvalidaError("Cálculo inconsistente debido a duración errónea.") from error_base
+
+            # Polimorfismo en acción: cada servicio calcula el costo a su manera
+            self.costo_total = self.servicio.calcular_costo(self.duracion, impuesto=0.19)
+            
+        except ErrorSistemaFJ as e:
+            # Registro en archivo logs
+            logging.error(f"Fallo en procesamiento: {e.__class__.__name__} - {e}")
+            self.estado = "Fallida"
+            print(f"Error procesando: {e}")
+        except Exception as e:
+            logging.error(f"Error crítico inesperado: {e}")
+            self.estado = "Cancelada por error del sistema"
+            print("Ocurrió un error inesperado, revisa los logs.")
+        else:
+            # Se ejecuta solo si NO hubo excepciones
+            self.estado = "Confirmada"
+            print(f"Reserva confirmada exitosamente. Costo Total: ${self.costo_total}")
+        finally:
+            # Se ejecuta siempre, ideal para liberar recursos o confirmar estados
+            print(f"Estado final de la operación: {self.estado}")
